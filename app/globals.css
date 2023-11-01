@@ -26,3 +26,19 @@ body {
         rgb(var(--background-start-rgb));
     box-sizing: border-box;
 }
+
+.gallery-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 grid-rows-2 gap-4;
+}
+
+.grid-item {
+    @apply col-span-1 border border-gray-400 rounded shadow-md transition-colors duration-300 ease-in-out;
+}
+
+.grid-item:hover {
+    @apply bg-black/80;
+}
+
+.featured-item {
+    @apply grid-item col-span-1 md:col-span-2 row-span-2 !rounded-lg !shadow-md;
+}

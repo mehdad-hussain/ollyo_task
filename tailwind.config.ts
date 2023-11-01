@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config, } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -15,6 +15,18 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
-}
-export default config
+  plugins: [
+    function ({ addVariant }: { addVariant: Function; }) {
+      addVariant('child', '& > *');
+      addVariant('child-hover', '& > *:hover');
+      addVariant('child-focus', '& > *:focus');
+      addVariant('child-active', '& > *:active');
+      addVariant('child-disabled', '& > *:disabled');
+      addVariant('child-group-hover', '&:hover > *');
+
+      addVariant('first-child', '& > *:first-child');
+      addVariant('last-child', '& > *:last-child');
+    }
+  ],
+};
+export default config;
