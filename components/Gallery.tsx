@@ -1,21 +1,21 @@
 'use client';
 import { GalleryImage } from '@/model/GalleryPageDTO';
+import ImageSVG from '@/public/icons/Image';
 import Image from 'next/image';
 import { useState } from 'react';
 
 type GalleryProps = {
     images: GalleryImage[];
-    onDelete: (ids: string[]) => void; // Update the onDelete function to accept an array of IDs
+    onDelete: (ids: string[]) => void;
     onReorder: (images: GalleryImage[]) => void;
 };
 
 const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
-    const [selectedImages, setSelectedImages] = useState<string[]>([]); // State to store selected image IDs
-
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [draggedImage, setDraggedImage] = useState<GalleryImage | null>(null);
 
     const onDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-        // Set the dragged image when the drag starts
         setDraggedImage(images[index]);
     };
 
@@ -31,12 +31,10 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
     };
 
     const onDrop = (index: number) => {
-        // Reset the dragged image when dropping
         setDraggedImage(null);
     };
 
     const toggleImageSelection = (id: string) => {
-        // Toggle the selection of an image
         if (selectedImages.includes(id)) {
             setSelectedImages(
                 selectedImages.filter((imageId) => imageId !== id)
@@ -47,17 +45,7 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
     };
 
     const clearSelection = () => {
-        // Clear the selection of all images
         setSelectedImages([]);
-    };
-
-    const setFeatureImage = (imageId: string) => {
-        // Mark an image as the featured image
-        const updatedImages = images.map((image) => ({
-            ...image,
-            isFeatured: image.id === imageId,
-        }));
-        onReorder(updatedImages);
     };
 
     const handleDeleteSelected = () => {
@@ -65,7 +53,7 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
         onDelete(selectedImages);
         clearSelection(); // Clear the selection after deleting
     };
-    const [hoveredIndex, setHoveredIndex] = useState<any>(null);
+
 
     return (
         <>
@@ -95,20 +83,20 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
                                 (index === 0 ? 'featured-item' : 'grid-item') +
                                 ' relative'
                             }
-                            onMouseEnter={() => setHoveredIndex(index)} // Track hover index
-                            onMouseLeave={() => setHoveredIndex(null)} // Clear hover index
-                            onClick={() => toggleImageSelection(image.id)} // Toggle image selection on click
+                            onMouseEnter={() => setHoveredIndex(index)}
+                            onMouseLeave={() => setHoveredIndex(null)}
+                            onClick={() => toggleImageSelection(image.id)}
                         >
-                            {index === hoveredIndex ? ( // Show the delete button only when hovering
-                                <input
-                                    type="checkbox"
-                                    className="absolute top-4 left-4 w-4 h-4 z-20"
-                                    checked={selectedImages.includes(image.id)}
-                                    onChange={() =>
-                                        toggleImageSelection(image.id)
-                                    }
-                                />
-                            ) : null}
+
+
+                            <input
+                                type="checkbox"
+                                className={`absolute top-4 left-4 w-4 h-4 z-20 ${index === hoveredIndex || selectedImages.includes(image.id) ? 'block' : 'hidden'}`}
+                                checked={selectedImages.includes(image.id)}
+                                onChange={() =>
+                                    toggleImageSelection(image.id)
+                                }
+                            />
 
                             <Image
                                 src={image.src}
@@ -119,6 +107,24 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
                             />
                         </div>
                     ))}
+
+                    {/* Add input box for adding/uploading new images */}
+                    <div className="relative border-dashed border border-gray-500 rounded-md">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="w-full h-full absolute inset-0 opacity-0 cursor-pointer z-20"
+                        // Handle file input change event to add new images
+                        />
+                        <label
+                            htmlFor="image-input"
+                            className="w-full h-full absolute inset-0 flex flex-col items-center justify-center cursor-pointer z-10"
+                        >
+                            <ImageSVG className="w-6 h-6 text-gray-300" />
+                            <div className="text-gray-500 text-lg mt-2">Add Images</div>
+                        </label>
+                    </div>
+
                 </div>
             </div>
         </>
@@ -127,3 +133,11 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
 
 export default Gallery;
 
+// const setFeatureImage = (imageId: string) => {
+//     // Mark an image as the featured image
+//     const updatedImages = images.map((image) => ({
+//         ...image,
+//         isFeatured: image.id === imageId,
+//     }));
+//     onReorder(updatedImages);
+// };
