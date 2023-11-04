@@ -4,7 +4,7 @@ import ImageSVG from '@/public/icons/Image';
 import Image from 'next/image';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-
+import GalleryHeader from './GalleryHeader';
 
 type GalleryProps = {
     images: GalleryImage[];
@@ -12,30 +12,25 @@ type GalleryProps = {
     onReorder: (images: GalleryImage[]) => void;
 };
 
-const dragStartAnimation = "transform 0.3s ease";
-const dragOverAnimation = "border-color 0.3s ease";
-const dragDropAnimation = "transform 0.3s ease";
-
 const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [draggedImage, setDraggedImage] = useState<GalleryImage | null>(null);
 
-    const onDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    const onDragStart = (e: MouseEvent | PointerEvent | TouchEvent, index: number) => {
         setDraggedImage(images[index]);
     };
+
 
     const onDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         e.preventDefault();
         if (!draggedImage) return;
 
-        // Reorder the images while dragging
         const newImages = [...images];
         newImages.splice(images.indexOf(draggedImage), 1);
         newImages.splice(index, 0, draggedImage);
         onReorder(newImages);
 
-        // Clear the drag data to allow the drag event to fire again
         e.dataTransfer.dropEffect = 'move';
     };
 
@@ -58,62 +53,53 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
     };
 
     const handleDeleteSelected = () => {
-        // Handle deleting selected images
         onDelete(selectedImages);
-        clearSelection(); // Clear the selection after deleting
+        clearSelection();
     };
 
 
     return (
         <>
             <div className="bg-white rounded-lg shadow-sm">
-                <div className="flex justify-between px-6 py-3 border-b border-gray-300 shadow-inner">
-                    {selectedImages.length === 0 ? ( // Check if no items are selected
-                        <p className="font-bold text-lg text-black transition-all">Gallery</p>
-                    ) : (
-                        <div className='flex gap-2 cursor-pointer' onClick={clearSelection}>
-                            <input
-                                type="checkbox"
-                                // className={``}
-                                checked={true}
-                            // onChange={clearSelection}
-                            />
-                            <p className="font-semibold text-lg text-black transition-all">{selectedImages.length > 1 ? `${selectedImages.length} files` : `${selectedImages.length} file`} selected</p>
-                        </div>
-                    )}
-                    {selectedImages.length > 0 && (
-                        <button
-                            onClick={handleDeleteSelected}
-                            className="text-red-600 text-sm font-semibold transition-all"
-                        >
-                            Delete files
-                        </button>
-                    )}
-                </div>
-                <hr />
+                <GalleryHeader
+                    selectedImagesCount={selectedImages.length}
+                    onClearSelection={clearSelection}
+                    onDeleteSelected={handleDeleteSelected}
+                />
 
                 <div className="gallery-grid m-8 pb-8">
                     {images.map((image, index) => (
-                        <div
+                        <motion.div
                             key={image.id}
                             draggable
                             onDragStart={(e) => onDragStart(e, index)}
                             onDragOver={(e) => onDragOver(e, index)}
                             onDrop={() => onDrop(index)}
-                            className={`${index === 0 ? "featured-item" : "grid-item"
+                            whileHover={{
+                                scale: 1.05,
+                                boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+                            }} // Hover animation with a subtle shadow
+                            initial={{ opacity: 1 }}
+                            animate={
+                                draggedImage
+                                    ? { scale: 0.9, opacity: 0.8 }
+                                    : { scale: 1, opacity: 1 }
+                            } // Drag animation with opacity change
+                            className={`${index === 0 ? 'featured-item' : 'grid-item'
                                 } relative`}
                             onMouseEnter={() => setHoveredIndex(index)}
                             onMouseLeave={() => setHoveredIndex(null)}
                             onClick={() => toggleImageSelection(image.id)}
                         >
-
                             <input
                                 type="checkbox"
-                                className={`absolute top-4 left-4 w-4 h-4 z-20 ${index === hoveredIndex || selectedImages.includes(image.id) ? 'block' : 'hidden'}`}
+                                className={`absolute top-4 left-4 w-4 h-4 z-20 ${index === hoveredIndex ||
+                                    selectedImages.includes(image.id)
+                                    ? 'block'
+                                    : 'hidden'
+                                    }`}
                                 checked={selectedImages.includes(image.id)}
-                                onChange={() =>
-                                    toggleImageSelection(image.id)
-                                }
+                                onChange={() => toggleImageSelection(image.id)}
                             />
 
                             <Image
@@ -123,15 +109,10 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
                                 height={300}
                                 className="object-contain w-full h-full hover:opacity-50 transition-opacity duration-300 hover:cursor-pointer bg-white"
                             />
-                        </div>
+                        </motion.div>
                     ))}
 
-                    <div
-                        className="relative border-dashed border border-gray-500 w-[150px] h-[150px] rounded-md"
-                    // style={{
-                    //     transition: dragDropAnimation,
-                    // }}
-                    >
+                    <div className="relative border-dashed border border-gray-500 w-[150px] h-[150px] rounded-md place-self-center">
                         <input
                             type="file"
                             accept="image/*"
@@ -147,7 +128,6 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
                             </div>
                         </label>
                     </div>
-
                 </div>
             </div>
         </>

@@ -8,7 +8,6 @@ import { useState } from 'react';
 type GalleryUIProps = {};
 
 const GalleryUI = ({ }: GalleryUIProps) => {
-    // State to manage the images
     const [images, setImages] = useState<GalleryImage[]>(initialImages);
 
     // Function to delete selected images
