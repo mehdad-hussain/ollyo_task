@@ -1,10 +1,10 @@
 'use client';
-import { GalleryImage } from '@/model/GalleryPageDTO';
-import ImageSVG from '@/public/icons/Image';
 import Image from 'next/image';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import GalleryHeader from './GalleryHeader';
+import { GalleryImage } from '@/model/GalleryPageDTO';
+import ImageSVG from '@/public/icons/Image';
 
 type GalleryProps = {
     images: GalleryImage[];
@@ -20,7 +20,6 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
     const onDragStart = (e: MouseEvent | PointerEvent | TouchEvent, index: number) => {
         setDraggedImage(images[index]);
     };
-
 
     const onDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         e.preventDefault();
@@ -68,6 +67,8 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
                 />
 
                 <div className="gallery-grid m-8 pb-8">
+
+                    {/* image grid */}
                     {images.map((image, index) => (
                         <motion.div
                             key={image.id}
@@ -112,6 +113,7 @@ const Gallery = ({ images, onDelete, onReorder }: GalleryProps) => {
                         </motion.div>
                     ))}
 
+                    {/* image upload section */}
                     <div className="relative border-dashed border border-gray-500 w-[150px] h-[150px] rounded-md place-self-center">
                         <input
                             type="file"
